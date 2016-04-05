@@ -7,6 +7,10 @@ local schema_util_C = schema_util.schema_util_C
 
 local null = ffi.cast('void *', 0)
 local regs = ffi.new('struct tarantool_schema_proc_Regs')
+regs.t[0] = ffi.C.malloc(4096)
+regs.v[0] = ffi.C.malloc(4096*8)
+regs.ot = ffi.C.malloc(512)
+regs.ov = ffi.C.malloc(512 * 8)
 
 local bank = digest.base64_decode('p0pvdXJuYWykTHVja6dBZ2lsaXR5rEludGVsbGlnZW5jZahDaGFyaXNtYalFbmR1cmFuY2WqUGVyY2VwdGlvbqhTdHJlbmd0aKVTdGF0c6RNQUxFpkZFTUFMRaNTZXijQWdlpUNsYXNzqExhc3ROYW1lqUZpcnN0TmFtZQ==')
 
@@ -23,7 +27,7 @@ local function flatten(data)
     r.b2 = ffi.cast('const uint8_t *', bank)
     r.b2 = r.b2 + #bank
 
-    r.rc = schema_util_C.preprocess_msgpack(data, #data, 0, null, null, r.t, r.v)
+    r.rc = schema_util_C.preprocess_msgpack(data, #data, 4096, r.t[0], r.v[0], r.t, r.v)
     if r.rc < 0 then
         error('preprocess_msgpack: -1')
     end
@@ -201,13 +205,8 @@ local function flatten(data)
     -- begin output stage 
     --
 
-    -- reserve 14 + journal.length slots
+    -- XXX check if fits
     local slots = 14 + r.v[0][rr13].xlen
-    r.ot = ffi.C.malloc(slots)
-    r.ov = ffi.C.malloc(slots * 8)
-    if r.ot == 0 or r.ov == 0 then
-        error('malloc')
-    end
 
     r.ot[0 ] = 11; r.ov[0 ].xlen = 13
     -- #1  FirstName
@@ -246,18 +245,13 @@ local function flatten(data)
         i = i + 1
     end
 
-    r.rc = schema_util_C.create_msgpack(slots, r.ot, r.ov, r.b1, r.b2, 0, null, r.res)
+    r.rc = schema_util_C.create_msgpack(slots, r.ot, r.ov, r.b1, r.b2, 4096, r.t[0], r.res)
     if r.rc < 0 then
         error('create_msgpack: -1')
     end
     local res = ffi.string(r.res[0], r.rc)
-
-    ffi.C.free(r.t[0])
-    ffi.C.free(r.v[0])
-    ffi.C.free(r.ot)
-    ffi.C.free(r.ov)
-    ffi.C.free(r.res[0])
-
+    -- Note: without res local, JIT manages to elide ffi.string()
+    -- completely during benchmark, NOT fair!
     return res
 end
 
