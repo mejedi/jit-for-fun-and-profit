@@ -15,7 +15,7 @@ local function preprocess_msgpack(msgpack)
     if rc < 0 then
         error('schema_util_C.preprocess_msgpack: -1')
     end
-    return rc, ffi.gc(out_arg1[0], ffi.C.free), ffi.gc(out_arg2[0], ffi.C.free)
+    return rc, out_arg1[0], out_arg2[0]
 end
     
 local function create_msgpack(n, t, v, b1, b2)
@@ -24,7 +24,7 @@ local function create_msgpack(n, t, v, b1, b2)
     if rc < 0 then
         error('schema_util_C.create_msgpack: -1')
     end
-    return rc, ffi.gc(out_arg1[0], ffi.C.free)
+    return rc, out_arg1[0], ffi.C.free
 end
 
 local bank = digest.base64_decode('p0pvdXJuYWykTHVja6dBZ2lsaXR5rEludGVsbGlnZW5jZahDaGFyaXNtYalFbmR1cmFuY2WqUGVyY2VwdGlvbqhTdHJlbmd0aKVTdGF0c6RNQUxFpkZFTUFMRaNTZXijQWdlpUNsYXNzqExhc3ROYW1lqUZpcnN0TmFtZQ==')
@@ -215,8 +215,8 @@ local function flatten(input)
 
     -- reserve 14 + journal.length slots
     local slots = 14 + v[rr13].xlen
-    local ot = ffi.gc(ffi.cast('uint8_t *', ffi.C.malloc(slots)), ffi.C.free)
-    local ov = ffi.gc(ffi.cast('struct tarantool_schema_preproc_Value *', ffi.C.malloc(slots * 8)), ffi.C.free)
+    local ot = ffi.cast('uint8_t *', ffi.C.malloc(slots))
+    local ov = ffi.cast('struct tarantool_schema_preproc_Value *', ffi.C.malloc(slots * 8))
     if ot == 0 or ov == 0 then
         error('malloc')
     end
@@ -261,11 +261,11 @@ local function flatten(input)
     local len, data = create_msgpack(slots, ot, ov, ib, b)
     local res = ffi.string(data, len)
 
-    ffi.C.free(ffi.gc(t, nil))
-    ffi.C.free(ffi.gc(v, nil))
-    ffi.C.free(ffi.gc(ot, nil))
-    ffi.C.free(ffi.gc(ov, nil))
-    ffi.C.free(ffi.gc(data, nil))
+    ffi.C.free(t)
+    ffi.C.free(v)
+    ffi.C.free(ot)
+    ffi.C.free(ov)
+    ffi.C.free(data)
 
     return res
 end
