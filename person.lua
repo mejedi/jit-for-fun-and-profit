@@ -38,7 +38,6 @@ local function flatten(input)
     local n, t, v = preprocess_msgpack(input)
     local b = ffi.cast('const uint8_t *', bank) + #bank
     local ib = ffi.cast('const uint8_t *', input) + #input
-    local ks, kl
 
     local rr0  = 0 -- FirstName
     local rr1  = 0 -- LastName
@@ -65,7 +64,7 @@ local function flatten(input)
     local i, stop = 1, v[0].xoff
     while i ~= stop do
         if t[i] ~= 8 then error('::root:: key not str') end
-        ks, kl = ib - v[i].xoff, v[i].xlen
+        local ks, kl = ib - v[i].xoff, v[i].xlen
         if kl < 3 then unknown_key(ks, kl) end
         if     ks[1] == 105 then -- F_i_rstName
             if kl ~= 9 or ffi.C.memcmp(ks, b - 9, 9) ~= 0 then
@@ -105,7 +104,7 @@ local function flatten(input)
             end
             if t[i+1] ~= 8 then error('Sex not str') end
             if rr4 ~= 2 then error('Sex dup') end
-            ks, kl = ib - v[i+1].xoff, v[i+1].xlen
+            local ks, kl = ib - v[i+1].xoff, v[i+1].xlen
             if kl < 4 then error('wrong Sex') end
             if     ks[0] == 70 then -- F_EMALE
                 if kl ~= 6 or ffi.C.memcmp(ks, b - 39, 6) ~= 0 then
@@ -133,7 +132,7 @@ local function flatten(input)
             i = i + 2
             while i ~= stop do
                 if t[i] ~= 8 then error('Stats key not str') end
-                ks, kl = ib - v[i].xoff, v[i].xlen
+                local ks, kl = ib - v[i].xoff, v[i].xlen
                 if kl < 4 then unknown_key(ks, kl) end
                 if     ks[0] == 83 then -- S_trength
                     if kl ~= 8 or ffi.C.memcmp(ks, b - 59, 8) ~= 0 then
