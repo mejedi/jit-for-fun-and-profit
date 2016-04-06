@@ -210,29 +210,29 @@ local function flatten(data)
 
     r.ot[0 ] = 11; r.ov[0 ].xlen = 13
     -- #1  FirstName
-    r.ot[1 ] =  8; r.ov[1 ] = r.v[0][rr0]
+    r.ot[1 ] =  8; r.ov[1 ].uval = r.v[0][rr0].uval
     -- #2  LastName
-    r.ot[2 ] =  8; r.ov[2 ] = r.v[0][rr1]
+    r.ot[2 ] =  8; r.ov[2 ].uval = r.v[0][rr1].uval
     -- #3  Class
-    r.ot[3 ] =  8; r.ov[3 ] = r.v[0][rr2]
+    r.ot[3 ] =  8; r.ov[3 ].uval = r.v[0][rr2].uval
     -- #4  Age
-    r.ot[4 ] =  4; r.ov[4 ] = r.v[0][rr3]
+    r.ot[4 ] =  4; r.ov[4 ].uval = r.v[0][rr3].uval
     -- #5  Sex
     r.ot[5 ] =  4; r.ov[5 ].uval = rr4
     -- #6  Stats.Strength
-    r.ot[6 ] =  4; r.ov[6 ] = r.v[0][rr6]
+    r.ot[6 ] =  4; r.ov[6 ].uval = r.v[0][rr6].uval
     -- #7  Stats.Perception
-    r.ot[7 ] =  4; r.ov[7 ] = r.v[0][rr7]
+    r.ot[7 ] =  4; r.ov[7 ].uval = r.v[0][rr7].uval
     -- #8  Stats.Endurance
-    r.ot[8 ] =  4; r.ov[8 ] = r.v[0][rr8]
+    r.ot[8 ] =  4; r.ov[8 ].uval = r.v[0][rr8].uval
     -- #9  Stats.Charisma
-    r.ot[9 ] =  4; r.ov[9 ] = r.v[0][rr9]
+    r.ot[9 ] =  4; r.ov[9 ].uval = r.v[0][rr9].uval
     -- #10 Stats.Intelligence
-    r.ot[10] =  4; r.ov[10] = r.v[0][rr10]
+    r.ot[10] =  4; r.ov[10].uval = r.v[0][rr10].uval
     -- #11 Stats.Agility
-    r.ot[11] =  4; r.ov[11] = r.v[0][rr11]
+    r.ot[11] =  4; r.ov[11].uval = r.v[0][rr11].uval
     -- #12 Stats.Luck
-    r.ot[12] =  4; r.ov[12] = r.v[0][rr12]
+    r.ot[12] =  4; r.ov[12].uval = r.v[0][rr12].uval
     -- #13 Journal
     r.ot[13] = 11; r.ov[13].xlen = r.v[0][rr13].xlen
 
@@ -241,7 +241,7 @@ local function flatten(data)
         if r.t[0][rr13 + i + 1] ~= 8 then
             error(string.format('Journal[%d] not str', i))
         end
-        r.ot[14 + i] = 8; r.ov[14 + i] = r.v[0][rr13 + i + 1]
+        r.ot[14 + i] = 8; r.ov[14 + i].uval = r.v[0][rr13 + i + 1].uval
         i = i + 1
     end
 
